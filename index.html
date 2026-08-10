@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MinoosSS - Among Us Benzeri 2D Oyun</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <div id="startScreen" class="panel start-panel">
+        <h1>MinoosSS</h1>
+        <p>Bir uzay gemisinde görevini tamamla. Adını yaz ve başla.</p>
+        <input id="playerName" type="text" maxlength="20" placeholder="Adın ne?" />
+        <button id="startButton">Oyuna Başla</button>
+        <p class="hint">Minoss yazarsan: Ada Kurucu unvanı kazanırsın.</p>
+      </div>
+
+      <div id="gameWrap" class="hidden">
+        <div class="hud">
+          <div>
+            <strong id="playerLabel">Oyuncu</strong>
+            <span id="playerTitle">Crewmate</span>
+          </div>
+          <div id="taskCounter">Görev: 0/3</div>
+        </div>
+        <div class="game-stage">
+          <canvas id="gameCanvas" width="900" height="540"></canvas>
+          <button id="useButton" class="action-button hidden">Use</button>
+        </div>
+        <div id="status" class="status-box">WASD veya ok tuşlarıyla hareket et. Görevlerin yakınında E'ye bas veya mobilde Use'a dokun.</div>
+      </div>
+    </div>
+
+    <script src="game2.js"></script>
+  </body>
+</html>

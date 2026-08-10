@@ -1,0 +1,145 @@
+:root {
+  color-scheme: dark;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #10233d 0%, #060b16 70%, #03050b 100%);
+  color: #f2f7ff;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.app-shell {
+  width: min(960px, 100%);
+}
+
+.panel {
+  background: linear-gradient(135deg, rgba(12, 24, 40, 0.96), rgba(8, 14, 26, 0.92));
+  border: 1px solid rgba(120, 170, 255, 0.25);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.42);
+  border-radius: 24px;
+  padding: 32px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.start-panel h1 {
+  margin: 0 0 12px;
+  font-size: 2.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #dfefff;
+  text-shadow: 0 0 16px rgba(83, 143, 255, 0.38);
+}
+
+.start-panel p {
+  margin: 0 0 18px;
+  color: #c7d6f0;
+}
+
+.start-panel input {
+  width: min(320px, 100%);
+  padding: 12px 14px;
+  border-radius: 999px;
+  border: 1px solid #4f5b75;
+  outline: none;
+  background: rgba(8, 17, 31, 0.95);
+  color: #fff;
+  font-size: 1rem;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.start-panel button {
+  margin-top: 16px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #2fb4ff, #8f68ff);
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 10px 25px rgba(79, 123, 255, 0.26);
+}
+
+.start-panel button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(79, 123, 255, 0.35);
+}
+
+.hint {
+  font-size: 0.95rem;
+  color: #80b7ff;
+}
+
+.hidden {
+  display: none;
+}
+
+.hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 16px 16px 0 0;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: none;
+}
+
+.game-stage {
+  position: relative;
+}
+
+.action-button {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #2fb4ff, #8f68ff);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
+}
+
+#playerLabel {
+  display: block;
+  font-size: 1rem;
+}
+
+#playerTitle {
+  display: inline-block;
+  margin-top: 3px;
+  color: #80b7ff;
+  font-size: 0.9rem;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  border-radius: 0 0 16px 16px;
+  background: #07111d;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: none;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3);
+}
+
+.status-box {
+  padding: 12px 16px;
+  background: linear-gradient(180deg, rgba(4, 10, 22, 0.94), rgba(2, 8, 19, 0.96));
+  color: #dcecff;
+  border-radius: 0 0 16px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: none;
+}
