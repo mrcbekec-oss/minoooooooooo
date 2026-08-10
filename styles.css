@@ -113,6 +113,39 @@ body {
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
 }
 
+.mobile-joystick {
+  position: absolute;
+  left: 18px;
+  bottom: 18px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(6px);
+}
+
+.joystick-base {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+}
+
+.joystick-knob {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fff, #8ecbff);
+  top: 23px;
+  left: 23px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.24);
+}
+
 #playerLabel {
   display: block;
   font-size: 1rem;

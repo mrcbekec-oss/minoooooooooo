@@ -10,6 +10,7 @@ const playerTitle = document.getElementById('playerTitle');
 const taskCounter = document.getElementById('taskCounter');
 const statusBox = document.getElementById('status');
 const useButton = document.getElementById('useButton');
+const mobileJoystick = document.getElementById('mobileJoystick');
 
 let playerName = 'Crewmate';
 let playerTitleText = 'Crewmate';
@@ -22,10 +23,18 @@ let elapsed = 0;
 let interactionTarget = null;
 let lastHintTask = null;
 let playerGhost = false;
+let killFlashTime = 0;
+let killFlashTarget = null;
 
 const keys = {};
 let spaceQueued = false;
 const isMobile = window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
+let joystickActive = false;
+let joystickAngle = 0;
+let joystickStrength = 0;
+let joystickTouchId = null;
+let joystickKnob = null;
+let joystickBase = null;
 
 const player = {
   x: 360,
@@ -57,7 +66,7 @@ const npcs = [
   { x: 260, y: 180, radius: 16, color: '#4fd1c5', role: 'crewmate', vx: 45, vy: -20, revealed: false, alive: true, targetTaskIndex: 3, taskProgress: 0, killTimer: 0 },
   { x: 600, y: 120, radius: 16, color: '#ff8f5b', role: 'crewmate', vx: -35, vy: 50, revealed: false, alive: true, targetTaskIndex: 4, taskProgress: 0, killTimer: 0 },
   { x: 340, y: 390, radius: 16, color: '#c48cff', role: 'crewmate', vx: 55, vy: -45, revealed: false, alive: true, targetTaskIndex: 5, taskProgress: 0, killTimer: 0 },
-  { x: 760, y: 380, radius: 16, color: '#ff4d6d', role: 'impostor', vx: -70, vy: 25, revealed: false, alive: true, targetTaskIndex: -1, taskProgress: 0, killTimer: 4 },
+  { x: 760, y: 380, radius: 16, color: '#ff4d6d', role: 'impostor', vx: -70, vy: 25, revealed: false, alive: true, targetTaskIndex: -1, taskProgress: 0, killTimer: 4, killCount: 0 },
 ];
 
 function setStatus(message) {
@@ -145,6 +154,33 @@ function killNpc(npc, reason = 'Bir karakter öldürüldü.') {
   npc.alive = false;
   npc.revealed = true;
   setStatus(reason);
+}
+
+function triggerKillAnimation(targetNpc) {
+  killFlashTime = 0.18;
+  killFlashTarget = targetNpc;
+}
+
+function updateJoystickUI() {
+  if (!joystickKnob || !joystickBase) {
+    joystickKnob = mobileJoystick.querySelector('.joystick-knob');
+    joystickBase = mobileJoystick.querySelector('.joystick-base');
+  }
+
+  if (!isMobile) {
+    mobileJoystick.classList.add('hidden');
+    return;
+  }
+
+  mobileJoystick.classList.remove('hidden');
+  if (!joystickActive) {
+    joystickKnob.style.transform = 'translate(0px, 0px)';
+    return;
+  }
+
+  const moveX = Math.cos(joystickAngle) * joystickStrength * 18;
+  const moveY = Math.sin(joystickAngle) * joystickStrength * 18;
+  joystickKnob.style.transform = `translate(${moveX}px, ${moveY}px)`;
 }
 
 function startGame() {
@@ -316,6 +352,11 @@ function update(delta) {
     if (keys['arrowleft'] || keys['a']) dx -= 1;
     if (keys['arrowright'] || keys['d']) dx += 1;
 
+    if (joystickActive) {
+      dx += Math.cos(joystickAngle);
+      dy += Math.sin(joystickAngle);
+    }
+
     if (dx !== 0 || dy !== 0) {
       const length = Math.hypot(dx, dy) || 1;
       dx /= length;
@@ -367,12 +408,20 @@ function update(delta) {
           }
         }
 
-        const targetsToKill = killTargets.slice(0, 3);
+        const targetsToKill = killTargets.slice(0, 1);
         if (targetsToKill.length > 0) {
-          targetsToKill.forEach((target) => killNpc(target, 'İmpostor bir crewmate öldürdü!'));
-          setStatus('İmpostor bir turda 3 kişiyi öldürdü!');
+          targetsToKill.forEach((target) => {
+            if (Math.random() < 0.7) {
+              triggerKillAnimation(target);
+              killNpc(target, 'İmpostor bir crewmate öldürdü!');
+              npc.killCount = (npc.killCount || 0) + 1;
+            }
+          });
+          if (npc.killCount > 0) {
+            setStatus(`İmpostor ${npc.killCount} kişi öldürdü.`);
+          }
         }
-        npc.killTimer = 6;
+        npc.killTimer = 5 + Math.random() * 2;
       }
 
       if (!player.dead) {
@@ -423,6 +472,10 @@ function update(delta) {
     if (distanceToPlayer < 220) {
       npc.revealed = true;
     }
+  }
+
+  if (killFlashTime > 0) {
+    killFlashTime -= delta;
   }
 
   if (spaceQueued) {
@@ -487,6 +540,16 @@ function draw() {
     }
   }
 
+  if (killFlashTime > 0 && killFlashTarget) {
+    ctx.save();
+    ctx.globalAlpha = 0.6;
+    ctx.fillStyle = '#ff4d4d';
+    ctx.beginPath();
+    ctx.arc(killFlashTarget.x, killFlashTarget.y, 34, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
   if (player.dead) {
     drawCharacter(player.x, player.y, '#9ed6ff', true, true, false);
   } else {
@@ -526,6 +589,49 @@ window.addEventListener('keyup', (event) => {
 
 useButton.addEventListener('click', () => {
   interact();
+});
+
+if (isMobile) {
+  mobileJoystick.classList.remove('hidden');
+}
+
+mobileJoystick.addEventListener('touchstart', (event) => {
+  const touch = event.touches[0];
+  const rect = mobileJoystick.getBoundingClientRect();
+  const x = touch.clientX - rect.left - rect.width / 2;
+  const y = touch.clientY - rect.top - rect.height / 2;
+  const length = Math.hypot(x, y) || 1;
+  joystickTouchId = touch.identifier;
+  joystickActive = true;
+  joystickAngle = Math.atan2(y, x);
+  joystickStrength = Math.min(1, length / 36);
+  updateJoystickUI();
+  event.preventDefault();
+}, { passive: false });
+
+mobileJoystick.addEventListener('touchmove', (event) => {
+  const touch = Array.from(event.touches).find((item) => item.identifier === joystickTouchId);
+  if (!touch) return;
+  const rect = mobileJoystick.getBoundingClientRect();
+  const x = touch.clientX - rect.left - rect.width / 2;
+  const y = touch.clientY - rect.top - rect.height / 2;
+  const length = Math.hypot(x, y) || 1;
+  joystickAngle = Math.atan2(y, x);
+  joystickStrength = Math.min(1, length / 36);
+  updateJoystickUI();
+  event.preventDefault();
+}, { passive: false });
+
+mobileJoystick.addEventListener('touchend', () => {
+  joystickActive = false;
+  joystickStrength = 0;
+  updateJoystickUI();
+});
+
+mobileJoystick.addEventListener('touchcancel', () => {
+  joystickActive = false;
+  joystickStrength = 0;
+  updateJoystickUI();
 });
 
 updateTaskCounter();
